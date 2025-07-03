@@ -16,9 +16,9 @@ system_create_user() {
   if id "deploy" &>/dev/null; then
     printf "${YELLOW} ⚠️  O usuário 'deploy' já existe. Pulando criação...\n"
   else
-    ENCRYPTED_PASS=$(openssl passwd -crypt "${mysql_root_password}")
+    sudo useradd -m -s /bin/bash -G sudo deploy
 
-    sudo useradd -m -p "${ENCRYPTED_PASS}" -s /bin/bash -G sudo deploy
+    echo "deploy:${mysql_root_password}" | sudo chpasswd
 
     if id "deploy" &>/dev/null; then
       printf "${GREEN} ✅ Usuário 'deploy' criado com sucesso!\n"
@@ -29,6 +29,7 @@ system_create_user() {
 
   sleep 2
 }
+
 
 
 #######################################
