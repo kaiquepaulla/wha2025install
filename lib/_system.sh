@@ -9,18 +9,27 @@
 #######################################
 system_create_user() {
   print_banner
-  printf "${WHITE} 💻 Agora, vamos criar o usuário para a instancia...${GRAY_LIGHT}"
-  printf "\n\n"
+  printf "${WHITE} 💻 Agora, vamos criar o usuário para a instância...${GRAY_LIGHT}\n\n"
 
   sleep 2
 
-  sudo su - root <<EOF
-  useradd -m -p $(openssl passwd -crypt ${mysql_root_password}) -s /bin/bash -G sudo deploy
-  usermod -aG sudo deploy
-EOF
+  if id "deploy" &>/dev/null; then
+    printf "${YELLOW} ⚠️  O usuário 'deploy' já existe. Pulando criação...\n"
+  else
+    ENCRYPTED_PASS=$(openssl passwd -crypt "${mysql_root_password}")
+
+    sudo useradd -m -p "${ENCRYPTED_PASS}" -s /bin/bash -G sudo deploy
+
+    if id "deploy" &>/dev/null; then
+      printf "${GREEN} ✅ Usuário 'deploy' criado com sucesso!\n"
+    else
+      printf "${RED} ❌ Erro ao criar o usuário 'deploy'.\n"
+    fi
+  fi
 
   sleep 2
 }
+
 
 #######################################
 # clones repostories using git
